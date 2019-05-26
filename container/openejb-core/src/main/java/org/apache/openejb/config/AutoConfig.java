@@ -70,6 +70,7 @@ import javax.ejb.TimerService;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.jms.Queue;
 import javax.jms.Topic;
+import javax.naming.Reference;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
@@ -1430,7 +1431,9 @@ public class AutoConfig implements DynamicDeployer, JndiConstants {
                 final ResourceInfo jtaInfo = configFactory.getResourceInfo(potentialName);
                 if (jtaInfo != null) {
                     if (!"false".equalsIgnoreCase(jtaInfo.properties.getProperty("JtaManaged")) // don't test true since it can be missing
-                            && (jtaInfo.types.contains("DataSource") || jtaInfo.types.contains(DataSource.class.getName()))) {
+                            && (jtaInfo.types.contains("DataSource") || jtaInfo.types.contains(DataSource.class.getName())
+                                    || (jtaInfo.properties.get("reference") instanceof Reference // defined in <Context>
+                                            && DataSource.class.getName().equals(((Reference) jtaInfo.properties.get("reference")).getClassName())))) {
                         jtaDataSourceId = jtaInfo.id;
                         break;
                     } else {
